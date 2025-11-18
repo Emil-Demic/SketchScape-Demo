@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - SketchScape</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <span class="navbar-logo">🎨</span>
+                <span class="navbar-title">SketchScape</span>
+            </a>
+            <div class="navbar-menu">
+                <a href="about.html" class="navbar-link active">About</a>
+                <a href="https://arxiv.org/abs/2509.06566" target="_blank" rel="noopener noreferrer" class="navbar-link arxiv-link">
+                    <img src="arxiv-logo.svg" alt="arXiv" class="arxiv-logo">
+                </a>
+                <a href="https://github.com/Emil-Demic/SketchScape" target="_blank" rel="noopener noreferrer" class="navbar-link">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="about-section">
+            <h2>BMVC 2025 - Back To The Drawing Board: <br> Rethinking Scene-Level Sketch-Based Image Retrieval</h2>
+            
+            <div class="about-content">
+                <p class="intro-text">
+                    In the era of massive multimedia archives, finding the exact visual information you need is a major challenge. 
+                    While text-based retrieval is simple and intuitive, it often fails to capture complex spatial layouts or 
+                    fine-grained visual attributes.
+                </p>
+
+                <h3>Scene-Level Sketch-Based Image Retrieval</h3>
+                <p>
+                    Sketch-Based Image Retrieval (SBIR) offers a powerful alternative, letting you search with a direct visual language. 
+                    Our research tackles the difficult case of Scene-level SBIR—retrieving entire complex scenes based on abstract, 
+                    freehand sketches.
+                </p>
+
+                <div class="video-container">
+                    <iframe width="560" height="315" 
+                            src="https://www.youtube.com/embed/B9MsT_xJthU" 
+                            title="YouTube video player" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin" 
+                            allowfullscreen>
+                    </iframe>
+                </div>
+
+                <h3>Our Approach</h3>
+                <p>
+                    Instead of complex new architectures, we went back to the drawing board, revealing the untapped potential in 
+                    simple design choices: pre-training, model architecture, and training loss.
+                </p>
+
+                <div class="model-image">
+                    <img src="model.png" alt="Model Architecture Diagram">
+                    <p class="image-caption">Siamese encoder architecture with ConvNeXt backbone</p>
+                </div>
+
+                <h3>Key Insights</h3>
+                <p>Our method is driven by two insights:</p>
+                <ul>
+                    <li>The datasets are small and diverse, making models prone to overfitting</li>
+                    <li>Sketches are inherently imprecise, demanding robustness to ambiguity and noise</li>
+                </ul>
+
+                <h3>Architecture</h3>
+                <p>
+                    We use a Siamese encoder architecture that projects both sketches and images into a single, aligned embedding space. 
+                    This is vital for cross-modal alignment, especially with limited training samples, where heterogeneous encoders 
+                    often overfit.
+                </p>
+                <p>
+                    For the encoder, we chose <strong>ConvNeXt</strong>, pretrained as the visual encoder of a CLIP-based model. 
+                    This approach provides significantly better generalization capabilities compared to variants pretrained only on ImageNet.
+                </p>
+
+                <h3>Training Loss</h3>
+                <p>
+                    We designed a training loss that is explicitly robust to sketch ambiguity. We implemented the <strong>ICon loss</strong>, 
+                    which introduces an explicit debiasing mechanism. This mechanism down-weights misleading negatives in the batch, 
+                    effectively tolerating the inherent uncertainty of a sketch that might semantically align with multiple images.
+                </p>
+
+                <h3>Results</h3>
+                <p>
+                    The results confirm the power of this simple yet effective approach. On the challenging FS-COCO dataset, 
+                    comprising 10,000 MS-COCO images paired with realistic freehand scene sketches, our method achieves 
+                    state-of-the-art performance.
+                </p>
+
+                <div class="results-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>R@1 (Normal)</th>
+                                <th>R@5 (Normal)</th>
+                                <th>R@10 (Normal)</th>
+                                <th>R@1 (Unseen)</th>
+                                <th>R@5 (Unseen)</th>
+                                <th>R@10 (Unseen)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Siam-VGG</td>
+                                <td>23.3</td>
+                                <td>-</td>
+                                <td>52.6</td>
+                                <td>10.6</td>
+                                <td>-</td>
+                                <td>32.5</td>
+                            </tr>
+                            <tr>
+                                <td>HOLEF-VGG</td>
+                                <td>22.8</td>
+                                <td>-</td>
+                                <td>53.1</td>
+                                <td>10.9</td>
+                                <td>-</td>
+                                <td>33.1</td>
+                            </tr>
+                            <tr>
+                                <td>SceneTrilogy</td>
+                                <td>24.1</td>
+                                <td>-</td>
+                                <td>53.9</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>SceneDiff (w Sketch)</td>
+                                <td>25.2</td>
+                                <td>45.9</td>
+                                <td>55.9</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>FreestyleRet</td>
+                                <td>29.6</td>
+                                <td>-</td>
+                                <td>56.1</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr class="highlight">
+                                <td><strong>Ours</strong></td>
+                                <td><strong>61.9</strong></td>
+                                <td><strong>81.4</strong></td>
+                                <td><strong>87.2</strong></td>
+                                <td><strong>60.0</strong></td>
+                                <td><strong>80.2</strong></td>
+                                <td><strong>86.1</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="table-caption">Performance comparison on FS-COCO dataset</p>
+                </div>
+
+                <h3>Conclusion</h3>
+                <p>
+                    We have shown that a conceptually simple approach, built upon a careful choice of pre-training, encoder architecture, 
+                    and a debiased contrastive loss, can significantly outperform more complex methods in scene-level SBIR. 
+                    We believe our method provides a strong, efficient baseline and a clear path forward for future research in 
+                    cross-modal retrieval.
+                </p>
+
+                <div class="back-link">
+                    <a href="index.html" class="btn btn-primary">Try the Demo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
