@@ -1,6 +1,7 @@
 // Configuration
 const API_URL = 'https://emil-demic-sketchscape.hf.space/predict';
 const CDN_URL = 'https://d2f5e6rx1vgqv1.cloudfront.net/CDN_images/';
+const LAMBDA_URL = 'https://alfswbqowck7vdgbbntsxzomse0knwjw.lambda-url.eu-central-1.on.aws/';
 const TOTAL_GALLERY_IMAGES = 3000;
 
 // Pagination state
@@ -295,6 +296,26 @@ function isCanvasEmpty() {
     return true;
 }
 
+// Function to send sketch to Lambda for storage
+async function storeSketchInDatabase(base64Image) {
+    try {
+        await fetch(LAMBDA_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sketch: base64Image,
+                timestamp: new Date().toISOString()
+            })
+        });
+        console.log('Sketch stored successfully');  
+    } catch (error) {
+        console.error('Failed to store sketch:', error);
+        // Don't alert user - this is a background operation
+    }
+}
+
 // Submit sketch
 document.getElementById('submitBtn').addEventListener('click', async function() {
     // Get base64 image from canvas
@@ -306,6 +327,9 @@ document.getElementById('submitBtn').addEventListener('click', async function() 
     
     // Hide gallery section when showing results
     document.getElementById('gallerySection').style.display = 'none';
+    
+    // Store sketch in database (non-blocking)
+    storeSketchInDatabase(base64Image);
     
     try {
         // Send to API
