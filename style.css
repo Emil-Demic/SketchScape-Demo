@@ -170,6 +170,7 @@ header p {
     max-width: 100%;
     height: auto;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    touch-action: none; /* Prevents scrolling while drawing */
 }
 
 .controls {
@@ -177,6 +178,14 @@ header p {
     gap: 15px;
     justify-content: center;
     flex-wrap: wrap;
+}
+
+.disclaimer-text {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 15px;
+    font-style: italic;
 }
 
 .btn {

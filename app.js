@@ -19,6 +19,7 @@ const ctx = canvas.getContext('2d');
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
+let activeInputType = null;
 
 // Initialize canvas with white background
 ctx.fillStyle = 'white';
@@ -30,6 +31,13 @@ ctx.lineJoin = 'round';
 
 // Drawing event handlers
 function startDrawing(e) {
+    // Input locking logic using pointerType (mouse, pen, touch)
+    if (activeInputType === null) {
+        activeInputType = e.pointerType;
+    } else if (activeInputType !== e.pointerType) {
+        return;
+    }
+
     isDrawing = true;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -37,10 +45,18 @@ function startDrawing(e) {
     
     lastX = (e.clientX - rect.left) * scaleX;
     lastY = (e.clientY - rect.top) * scaleY;
+    
+    // Capture pointer to track movement outside canvas if needed
+    if (e.target.setPointerCapture) {
+        e.target.setPointerCapture(e.pointerId);
+    }
 }
 
 function draw(e) {
     if (!isDrawing) return;
+    
+    // Ensure we only draw with the active input type
+    if (activeInputType !== null && e.pointerType !== activeInputType) return;
     
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -58,42 +74,23 @@ function draw(e) {
     lastY = currentY;
 }
 
-function stopDrawing() {
+function stopDrawing(e) {
+    // Only stop if the event comes from the active input type
+    if (activeInputType !== null && e.pointerType !== activeInputType) return;
+    
     isDrawing = false;
+    
+    if (e.target.releasePointerCapture) {
+        e.target.releasePointerCapture(e.pointerId);
+    }
 }
 
-// Mouse events
-canvas.addEventListener('mousedown', startDrawing);
-canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('mouseup', stopDrawing);
-canvas.addEventListener('mouseout', stopDrawing);
-
-// Touch events for mobile support
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousedown', {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-    });
-    canvas.dispatchEvent(mouseEvent);
-});
-
-canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousemove', {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-    });
-    canvas.dispatchEvent(mouseEvent);
-});
-
-canvas.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    const mouseEvent = new MouseEvent('mouseup', {});
-    canvas.dispatchEvent(mouseEvent);
-});
+// Pointer events (handles mouse, pen, and touch unified)
+canvas.addEventListener('pointerdown', startDrawing);
+canvas.addEventListener('pointermove', draw);
+canvas.addEventListener('pointerup', stopDrawing);
+canvas.addEventListener('pointerout', stopDrawing);
+canvas.addEventListener('pointercancel', stopDrawing);
 
 // Initialize gallery on page load
 function initializeGallery() {
@@ -275,6 +272,9 @@ document.getElementById('clearBtn').addEventListener('click', function() {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = 'black';
+    
+    // Reset input lock
+    activeInputType = null;
     
     // Hide results and show gallery section when canvas is cleared
     document.getElementById('resultsSection').style.display = 'none';
