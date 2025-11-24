@@ -20,6 +20,7 @@ let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
 let activeInputType = null;
+let drawingHistory = [];
 
 // Initialize canvas with white background
 ctx.fillStyle = 'white';
@@ -29,6 +30,15 @@ ctx.lineWidth = 3;
 ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
 
+// Helper to save state for undo
+function saveState() {
+    // Limit history to 20 steps to prevent memory issues
+    if (drawingHistory.length > 20) {
+        drawingHistory.shift();
+    }
+    drawingHistory.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+}
+
 // Drawing event handlers
 function startDrawing(e) {
     // Input locking logic using pointerType (mouse, pen, touch)
@@ -37,6 +47,9 @@ function startDrawing(e) {
     } else if (activeInputType !== e.pointerType) {
         return;
     }
+
+    // Save state before new stroke
+    saveState();
 
     isDrawing = true;
     const rect = canvas.getBoundingClientRect();
@@ -267,14 +280,23 @@ document.getElementById('galleryPageJump').addEventListener('keypress', (e) => {
     }
 });
 
+// Undo functionality
+document.getElementById('undoBtn').addEventListener('click', function() {
+    if (drawingHistory.length > 0) {
+        const lastState = drawingHistory.pop();
+        ctx.putImageData(lastState, 0, 0);
+    }
+});
+
 // Clear canvas
 document.getElementById('clearBtn').addEventListener('click', function() {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = 'black';
     
-    // Reset input lock
+    // Reset input lock and history
     activeInputType = null;
+    drawingHistory = [];
     
     // Hide results and show gallery section when canvas is cleared
     document.getElementById('resultsSection').style.display = 'none';
